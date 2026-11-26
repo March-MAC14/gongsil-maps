@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="ko"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
+<title>초곡 지앤브이빌딩 — 업종 유치 후보 지도</title>
+<style>
+html,body{margin:0;height:100%;font:14px/1.5 "Apple SD Gothic Neo","Malgun Gothic","Noto Sans KR",sans-serif;color:#16251f}
+#map{position:absolute;inset:0}
+.panel{position:absolute;z-index:5;top:10px;left:10px;background:#fff;border-radius:10px;box-shadow:0 2px 12px rgba(0,0,0,.18);padding:10px 12px;width:230px;max-height:calc(100% - 20px);overflow:auto}
+.panel h1{font-size:15px;margin:0 0 2px;color:#173F35}
+.panel .s{color:#6b776f;font-size:12px;margin:0 0 8px}
+.panel label{display:flex;align-items:center;gap:7px;font-size:13px;padding:3px 0;cursor:pointer}
+.panel .row{display:flex;gap:6px;margin-top:8px}
+.panel button{flex:1;font:inherit;font-size:12px;border:1px solid #d9d2c3;background:#faf7f1;border-radius:6px;padding:6px;cursor:pointer}
+.dot{width:12px;height:12px;border-radius:50%;border:2px solid #fff;box-shadow:0 0 0 1px rgba(0,0,0,.3);flex:none;box-sizing:border-box}
+.pin{width:16px;height:16px;border-radius:50%;border:2.5px solid #fff;box-shadow:0 1px 4px rgba(0,0,0,.45);cursor:pointer;box-sizing:border-box}
+.star{background:#173F35;color:#fff;font-weight:700;font-size:13px;border-radius:6px;padding:4px 9px;white-space:nowrap;box-shadow:0 2px 6px rgba(0,0,0,.35);border:2px solid #AF8C45}
+.rl{color:#8a6a28;font-weight:700;font-size:12px;background:rgba(255,255,255,.85);border-radius:4px;padding:0 4px}
+.pop{position:absolute;z-index:6;left:50%;bottom:16px;transform:translateX(-50%);background:#fff;border-radius:12px;box-shadow:0 4px 18px rgba(0,0,0,.25);padding:12px 14px;width:min(360px,calc(100% - 24px));display:none}
+.pop .m{color:#6b776f;font-size:12px}
+.pop b{font-size:16px;display:block;margin:2px 0}
+.pop .x{position:absolute;top:6px;right:8px;border:0;background:none;font-size:20px;cursor:pointer;color:#888}
+.pop .btns{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.pop a{text-decoration:none;font-weight:700;border-radius:7px;padding:7px 11px;font-size:13px}
+.nv{background:#03C75A;color:#fff}.kk{background:#FEE500;color:#191919}.tl{background:#173F35;color:#fff}
+#err{display:none;position:absolute;z-index:9;inset:0;background:#faf7f1;padding:30px;font-size:15px}
+.tog{display:none}
+@media(max-width:600px){.panel{width:auto;right:10px;max-height:38%}.panel.min .body{display:none}.tog{display:inline;float:right;border:0;background:none;font-size:13px;color:#173F35;font-weight:700;cursor:pointer}}
+</style></head><body>
+<div id="map"></div>
+<div class="panel" id="panel"><button class="tog" id="tog">접기</button><h1>초곡 지앤브이빌딩 3·4층</h1><p class="s">업종 유치 후보 52곳 · 반경은 직선거리</p>
+<div class="body"><div id="lg"></div><div class="row"><button id="allOn">전체 켜기</button><button id="allOff">전체 끄기</button></div></div></div>
+<div class="pop" id="pop"></div>
+<div id="err"><b>지도를 불러오지 못했습니다.</b><br>카카오디벨로퍼스의 JavaScript SDK 도메인에 이 주소가 등록돼 있는지, 카카오맵 사용 설정이 ON인지 확인해 주세요.</div>
+<script src="https://dapi.kakao.com/v2/maps/sdk.js?appkey=8296dfe26fce4e6b650a19d608abb913&autoload=false"></script>
+<script>
+{
+const P=[{"n": "푸른 아동발달센터", "c": 1, "ph": "054-262-7973", "ad": "포항시 북구 흥해읍 한동로97번길 23-4", "fl": "3층", "d": 2.1, "lat": 36.114529, "lng": 129.349383}, {"n": "푸른아동발달센터(학천)", "c": 1, "ph": "(번호 미등록)", "ad": "포항시 북구 흥해읍 도음로917번길 24", "fl": "3층", "d": 2.0, "lat": 36.08227, "lng": 129.330263}, {"n": "이동언어학습연구소", "c": 1, "ph": "010-6491-7581", "ad": "포항시 북구 흥해읍 이인로 100 포레나상가 203동 2층", "fl": "3층", "d": 2.9, "lat": 36.07441, "lng": 129.331107}, {"n": "다움아동청소년발달연구소", "c": 1, "ph": "054-256-4321", "ad": "포항시 북구 장량로242번길 15", "fl": "3층", "d": 6.7, "lat": 36.083401, "lng": 129.40564}, {"n": "나래울 감각통합발달센터", "c": 1, "ph": "054-252-4598", "ad": "포항시 북구 장량중앙로 52 2층 201호", "fl": "3층", "d": 4.7, "lat": 36.092701, "lng": 129.385476}, {"n": "밸런스브레인 포항센터", "c": 1, "ph": "054-726-2143", "ad": "포항시 북구 양덕남로 65 2층", "fl": "3층", "d": 6.1, "lat": 36.081463, "lng": 129.397335}, {"n": "허그맘허그인 심리상담센터 포항지점", "c": 1, "ph": "054-232-9660", "ad": "포항시 북구 양덕남로 73 3층", "fl": "3층", "d": 6.2, "lat": 36.081476, "lng": 129.39829}, {"n": "소나무아동발달심리센터", "c": 1, "ph": "054-255-7577", "ad": "포항시 북구 법원로 157 3층", "fl": "3층", "d": 4.7, "lat": 36.091779, "lng": 129.385188}, {"n": "도담언어심리발달센터", "c": 1, "ph": "054-231-5679", "ad": "포항시 북구 천마로45번길 16 1층", "fl": "3층", "d": 5.6, "lat": 36.08362, "lng": 129.393143}, {"n": "아이하늘인지언어치료센터", "c": 1, "ph": "054-291-9569", "ad": "포항시 북구 성실로 55 창성빌딩 4층", "fl": "3층", "d": 4.9, "lat": 36.069162, "lng": 129.373068}, {"n": "징검다리 심리언어치료센터 북구점", "c": 1, "ph": "054-248-0958", "ad": "포항시 북구 법원로 53-1 201호", "fl": "3층", "d": 4.9, "lat": 36.082664, "lng": 129.383225}, {"n": "아란아동청소년발달센터", "c": 1, "ph": "010-5874-4216", "ad": "포항시 북구 장량로 55 한주빌딩 2층", "fl": "3층", "d": 4.8, "lat": 36.085564, "lng": 129.3844}, {"n": "라온아동심리발달센터", "c": 1, "ph": "054-241-5661", "ad": "포항시 북구 삼흥로 87", "fl": "3층", "d": 5.0, "lat": 36.072497, "lng": 129.376886}, {"n": "히엘ABA아동청소년발달센터 포항점", "c": 1, "ph": "010-9136-9731", "ad": "포항시 북구 동빈로94번길 9-3 노블리안 102동 201호", "fl": "3층", "d": 6.6, "lat": 36.048291, "lng": 129.368507}, {"n": "이동언어심리발달센터", "c": 1, "ph": "054-278-7579", "ad": "포항시 남구 대이로 105 아이코아 3층", "fl": "3층", "d": 8.1, "lat": 36.027281, "lng": 129.338656}, {"n": "코딩앤플레이 포항장량센터", "c": 2, "ph": "054-255-7123", "ad": "포항시 북구 양덕로44번길 6 3층", "fl": "4층", "d": 6.2, "lat": 36.085127, "lng": 129.400654}, {"n": "씨큐브코딩 포항북구센터", "c": 2, "ph": "054-252-0887", "ad": "포항시 북구 장량로241번길 12 3층", "fl": "4층", "d": 6.6, "lat": 36.085906, "lng": 129.404912}, {"n": "코딩그라운드 포항점", "c": 2, "ph": "054-277-8349", "ad": "포항시 남구 효성로 25 2층", "fl": "4층", "d": 10.1, "lat": 36.009307, "lng": 129.334443}, {"n": "코딩앤플레이 효자상도점", "c": 2, "ph": "010-8472-8219", "ad": "포항시 남구 상도남로33번길 14 1층", "fl": "4층", "d": 9.9, "lat": 36.011707, "lng": 129.344423}, {"n": "포항킨더코딩교습소", "c": 2, "ph": "(번호 미등록)", "ad": "포항시 남구 대이로159번길 17-13", "fl": "4층", "d": 7.7, "lat": 36.030865, "lng": 129.336233}, {"n": "틔움 독서논술", "c": 3, "ph": "010-3588-8273", "ad": "포항시 북구 흥해읍 펜타시티단지로 26 (아파트 내)", "fl": "4층", "d": 5.0, "lat": 36.059691, "lng": 129.310028}, {"n": "책나무이인독서논술학원", "c": 3, "ph": "054-261-4005", "ad": "포항시 북구 흥해읍 이인로 100 203동 210호", "fl": "4층", "d": 2.9, "lat": 36.07441, "lng": 129.331107}, {"n": "글정원전문독서논술학원", "c": 3, "ph": "054-248-5787", "ad": "포항시 북구 새천년대로1249번길 26 2층", "fl": "4층", "d": 4.8, "lat": 36.078931, "lng": 129.380643}, {"n": "미리내독서논술", "c": 3, "ph": "010-2445-2609", "ad": "포항시 북구 장량중앙로 15", "fl": "4층", "d": 4.3, "lat": 36.093837, "lng": 129.381376}, {"n": "리드인독서논술교습소(우현)", "c": 3, "ph": "054-610-3007", "ad": "포항시 북구 우창동로 57", "fl": "4층", "d": 5.2, "lat": 36.059631, "lng": 129.362523}, {"n": "한우리독서토론논술 우현교습소", "c": 3, "ph": "054-242-0152", "ad": "포항시 북구 우창동로 46", "fl": "4층", "d": 5.3, "lat": 36.058604, "lng": 129.36161}, {"n": "스카이실험과학", "c": 4, "ph": "010-5889-3014", "ad": "포항시 북구 천마로72번길 30 승연빌딩 2층 202호", "fl": "3층·4층", "d": 6.0, "lat": 36.085663, "lng": 129.398206}, {"n": "쿠킹클래스 오나", "c": 4, "ph": "054-249-4009", "ad": "포항시 북구 중앙로 304-4", "fl": "3층·4층", "d": 7.0, "lat": 36.042434, "lng": 129.364893}, {"n": "파티앤클래스 포항문덕점", "c": 4, "ph": "010-5574-7884", "ad": "포항시 남구 오천읍 원동로 11 상가동 3층 301호", "fl": "3층·4층", "d": 16.0, "lat": 35.966725, "lng": 129.40064}, {"n": "아이조아한의원 포항점", "c": 5, "ph": "054-275-5575", "ad": "포항시 북구 천마로 55 양덕빌딩 4층", "fl": "3층", "d": 5.7, "lat": 36.084272, "lng": 129.394551}, {"n": "늘사랑한의원", "c": 5, "ph": "054-614-0890", "ad": "포항시 북구 장량중앙로 55 미소빌딩 2층", "fl": "3층", "d": 4.8, "lat": 36.093071, "lng": 129.386154}, {"n": "열린한의원 포항양덕점", "c": 5, "ph": "054-254-2550", "ad": "포항시 북구 법원로 175", "fl": "3층", "d": 4.7, "lat": 36.093189, "lng": 129.385624}, {"n": "365금손한의원", "c": 5, "ph": "054-614-2227", "ad": "포항시 북구 새천년대로 1273 스타빌딩 2층", "fl": "3층", "d": 5.2, "lat": 36.077887, "lng": 129.384224}, {"n": "환호한의원", "c": 5, "ph": "0507-1305-7084", "ad": "포항시 북구 새천년대로 1314 3층", "fl": "3층", "d": 5.5, "lat": 36.078101, "lng": 129.388853}, {"n": "청학바둑", "c": 6, "ph": "054-247-6326", "ad": "포항시 북구 흥해읍 초곡지구로58번길 38-12 4층", "fl": "4층", "d": 0.0, "lat": 36.100356, "lng": 129.333995}, {"n": "프로9단 강만우바둑학원", "c": 6, "ph": "054-281-9100", "ad": "포항시 남구 포스코대로 145 3층 302호", "fl": "4층", "d": 8.0, "lat": 36.02885, "lng": 129.339524}, {"n": "이성호바둑학원", "c": 6, "ph": "054-282-4627", "ad": "포항시 남구 연일읍 유강길10번길 26 2층", "fl": "4층", "d": 10.3, "lat": 36.008346, "lng": 129.320165}, {"n": "효자바둑교습소", "c": 6, "ph": "010-7757-1483", "ad": "포항시 남구 효성로 68 2층", "fl": "4층", "d": 10.2, "lat": 36.008598, "lng": 129.339157}, {"n": "킨더짐 유아체육센터", "c": 7, "ph": "010-2045-7736", "ad": "포항시 북구 흥해읍 초곡지구로58번길 24-18 2층", "fl": "3층", "d": 0.1, "lat": 36.100673, "lng": 129.335336}, {"n": "쉼표 체형교정센터", "c": 7, "ph": "0507-1319-9875", "ad": "포항시 북구 천마로45번길 17 2층", "fl": "3층", "d": 5.6, "lat": 36.083223, "lng": 129.392721}, {"n": "몸바른체형교정센터", "c": 7, "ph": "010-7389-2583", "ad": "포항시 남구 대이로95번길 8-9 2층", "fl": "3층", "d": 8.2, "lat": 36.026852, "lng": 129.337557}, {"n": "알로하리틀", "c": 8, "ph": "010-5153-7606", "ad": "포항시 북구 흥해읍 도음로 808 2,3층", "fl": "4층", "d": 2.5, "lat": 36.080106, "lng": 129.320831}, {"n": "포항 파티룸 아짙", "c": 8, "ph": "0502-5552-7448", "ad": "포항시 북구 용두산길 6 포의빌딩 4층", "fl": "4층", "d": 5.6, "lat": 36.067481, "lng": 129.380591}, {"n": "고고파티룸", "c": 8, "ph": "010-6679-9982", "ad": "포항시 북구 법원로 116 3층", "fl": "4층", "d": 4.7, "lat": 36.088005, "lng": 129.383786}, {"n": "어푸", "c": 8, "ph": "010-3452-8785", "ad": "포항시 남구 효성로15번길 13-14 1층", "fl": "4층", "d": 10.0, "lat": 36.010251, "lng": 129.33477}, {"n": "워크24 포항점", "c": 9, "ph": "1833-4327", "ad": "포항시 북구 중흥로 265 1층 108호", "fl": "4층", "d": 8.2, "lat": 36.029381, "lng": 129.358629}, {"n": "디노플레이스 포항중앙점", "c": 9, "ph": "1833-4562", "ad": "포항시 북구 중앙상가1길 6 2층", "fl": "4층", "d": 7.2, "lat": 36.038814, "lng": 129.360708}, {"n": "워크웨이브", "c": 9, "ph": "0502-5551-1395", "ad": "포항시 북구 해안로 73 현대로데오타워 6층", "fl": "4층", "d": 6.0, "lat": 36.058145, "lng": 129.375022}, {"n": "토도스24 포항점", "c": 9, "ph": "010-4667-5502", "ad": "포항시 북구 중흥로 208 1층", "fl": "4층", "d": 8.6, "lat": 36.024777, "lng": 129.355852}, {"n": "인사이드요가 포항점", "c": 10, "ph": "054-244-7733", "ad": "포항시 북구 양덕로50번길 48 소울빌딩 2층", "fl": "3층", "d": 6.6, "lat": 36.085953, "lng": 129.405274}, {"n": "해피바이러스요가필라테스", "c": 10, "ph": "010-8289-0831", "ad": "포항시 북구 장량로113번길 28 2층", "fl": "3층", "d": 5.3, "lat": 36.087071, "lng": 129.390851}, {"n": "예스요가&필라테스", "c": 10, "ph": "054-255-4916", "ad": "포항시 북구 학산로 59 2층", "fl": "3층", "d": 6.1, "lat": 36.052714, "lng": 129.366937}];
+const CAT=['','아동발달센터','코딩·로봇','독서논술','키즈 요리·과학','소아 한의원','바둑·두뇌','체형교정·발달운동','키즈 파티룸','공유오피스','요가·필라테스'];
+const COL=['','#d6127e','#2f6fd1','#e07b00','#8a5cd0','#1f8a5b','#5b6b73','#c2410c','#e0559b','#0e8f9c','#a8851f'];
+const T={lat:36.100356,lng:129.333995};
+const esc=t=>String(t).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const q=p=>(p.ad.includes('흥해')?'포항 흥해 ':'포항 ')+p.n.replace(/\(.*\)/,'');
+if(!window.kakao||!kakao.maps){document.getElementById('err').style.display='block'}
+else kakao.maps.load(()=>{
+ const LL=(a,b)=>new kakao.maps.LatLng(a,b);
+ const map=new kakao.maps.Map(document.getElementById('map'),{center:LL(36.085,129.36),level:8});
+ map.addControl(new kakao.maps.MapTypeControl(),kakao.maps.ControlPosition.TOPRIGHT);
+ map.addControl(new kakao.maps.ZoomControl(),kakao.maps.ControlPosition.RIGHT);
+ [3,6,10].forEach(r=>{new kakao.maps.Circle({map,center:LL(T.lat,T.lng),radius:r*1000,strokeWeight:2,strokeColor:'#AF8C45',strokeOpacity:.9,strokeStyle:'dash',fillOpacity:0});
+  const el=document.createElement('span');el.className='rl';el.textContent=r+'km';
+  new kakao.maps.CustomOverlay({map,position:LL(T.lat-r/111*0.71,T.lng+r/(111*Math.cos(T.lat*Math.PI/180))*0.71),content:el,yAnchor:.5})});
+ const st=document.createElement('div');st.className='star';st.textContent='★ 목적물 (지앤브이빌딩)';
+ new kakao.maps.CustomOverlay({map,position:LL(T.lat,T.lng),content:st,yAnchor:1.3,zIndex:10});
+ const pop=document.getElementById('pop');
+ function show(p){pop.innerHTML=`<button class="x" aria-label="닫기">×</button><div class="m"><span class="dot" style="display:inline-block;vertical-align:-1px;background:${COL[p.c]}"></span> ${CAT[p.c]} · 추천 ${esc(p.fl)}</div><b>${esc(p.n)}</b><div class="m">${esc(p.ad)}</div><div class="m">목적물에서 약 ${p.d}km · ${esc(p.ph)}</div><div class="btns">${/^\d/.test(p.ph)?`<a class="tl" href="tel:${esc(p.ph)}">전화</a>`:''}<a class="kk" target="_blank" rel="noopener" href="https://map.kakao.com/link/search/${encodeURIComponent(q(p))}">카카오맵</a><a class="nv" target="_blank" rel="noopener" href="https://map.naver.com/p/search/${encodeURIComponent(q(p))}">네이버지도</a></div>`;
+  pop.style.display='block';pop.querySelector('.x').onclick=()=>pop.style.display='none'}
+ const ovs=P.map((p,i)=>{const el=document.createElement('div');el.className='pin';el.style.background=COL[p.c];el.title=p.n;el.onclick=()=>{show(p);map.panTo(LL(p.lat,p.lng))};
+  const o=new kakao.maps.CustomOverlay({position:LL(p.lat+((i%3)-1)*0.00004,p.lng+((i>>1)%3-1)*0.00004),content:el,yAnchor:.5,xAnchor:.5});o.setMap(map);return {o,p}});
+ const on=new Set([1,2,3,4,5,6,7,8,9,10]);
+ const lg=document.getElementById('lg');
+ lg.innerHTML=CAT.slice(1).map((c,j)=>`<label><input type="checkbox" checked data-c="${j+1}"><span class="dot" style="background:${COL[j+1]}"></span>${c} (${P.filter(p=>p.c===j+1).length})</label>`).join('');
+ function upd(){ovs.forEach(({o,p})=>o.setMap(on.has(p.c)?map:null))}
+ lg.addEventListener('change',e=>{const c=+e.target.dataset.c;e.target.checked?on.add(c):on.delete(c);upd()});
+ const setAll=v=>{lg.querySelectorAll('input').forEach(b=>{b.checked=v;const c=+b.dataset.c;v?on.add(c):on.delete(c)});upd()};
+ document.getElementById('allOn').onclick=()=>setAll(true);document.getElementById('allOff').onclick=()=>setAll(false);
+ kakao.maps.event.addListener(map,'click',()=>pop.style.display='none');
+});
+const pn=document.getElementById('panel');document.getElementById('tog').onclick=e=>{pn.classList.toggle('min');e.target.textContent=pn.classList.contains('min')?'펼치기':'접기'};
+if(window.innerWidth<600){pn.classList.add('min');document.getElementById('tog').textContent='펼치기'}
+}
+</script></body></html>
